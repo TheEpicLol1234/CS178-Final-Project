@@ -5,7 +5,7 @@ import seaborn as sns
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
@@ -44,6 +44,9 @@ scaler = StandardScaler()
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
+# Store metrics for each classifier
+metrics = {}
+
 # ================================================
 # 1. k-Nearest Neighbors (kNN)
 # ================================================
@@ -52,8 +55,12 @@ knn = KNeighborsClassifier(n_neighbors=5)
 knn.fit(X_train_scaled, y_train)
 y_pred_knn = knn.predict(X_test_scaled)
 
-print("Accuracy:", accuracy_score(y_test, y_pred_knn))
-print("Classification Report:\n", classification_report(y_test, y_pred_knn))
+metrics["kNN"] = {
+    "Accuracy": accuracy_score(y_test, y_pred_knn),
+    "Precision": precision_score(y_test, y_pred_knn),
+    "Recall": recall_score(y_test, y_pred_knn),
+    "F1": f1_score(y_test, y_pred_knn)
+}
 
 # ================================================
 # 2. Logistic Regression
@@ -63,8 +70,12 @@ lr = LogisticRegression(max_iter=1000)
 lr.fit(X_train_scaled, y_train)
 y_pred_lr = lr.predict(X_test_scaled)
 
-print("Accuracy:", accuracy_score(y_test, y_pred_lr))
-print("Classification Report:\n", classification_report(y_test, y_pred_lr))
+metrics["Logistic Regression"] = {
+    "Accuracy": accuracy_score(y_test, y_pred_lr),
+    "Precision": precision_score(y_test, y_pred_lr),
+    "Recall": recall_score(y_test, y_pred_lr),
+    "F1": f1_score(y_test, y_pred_lr)
+}
 
 # ================================================
 # 3. Feedforward Neural Network (scikit-learn MLP)
@@ -74,8 +85,12 @@ mlp = MLPClassifier(hidden_layer_sizes=(64, 32), max_iter=1000, random_state=42)
 mlp.fit(X_train_scaled, y_train)
 y_pred_mlp = mlp.predict(X_test_scaled)
 
-print("Accuracy:", accuracy_score(y_test, y_pred_mlp))
-print("Classification Report:\n", classification_report(y_test, y_pred_mlp))
+metrics["Feedforward NN"] = {
+    "Accuracy": accuracy_score(y_test, y_pred_mlp),
+    "Precision": precision_score(y_test, y_pred_mlp),
+    "Recall": recall_score(y_test, y_pred_mlp),
+    "F1": f1_score(y_test, y_pred_mlp)
+}
 
 # ================================================
 # 4. Confusion Matrices
@@ -90,4 +105,30 @@ def plot_confusion(title, y_true, y_pred):
 
 plot_confusion("kNN Confusion Matrix", y_test, y_pred_knn)
 plot_confusion("Logistic Regression Confusion Matrix", y_test, y_pred_lr)
-plot_confusion("Neural Network Confusion Matrix", y_test, y_pred_mlp)
+plot_confusion("Feedforward NN Confusion Matrix", y_test, y_pred_mlp)
+
+# ================================================
+# 5. Visualization of Metrics
+# ================================================
+
+def plot_metrics(metrics_dict):
+    metrics_names = ['Accuracy', 'Precision', 'Recall', 'F1']
+    classifiers = list(metrics_dict.keys())
+    values = {metric: [metrics_dict[classifier][metric] for classifier in classifiers] for metric in metrics_names}
+
+    x = np.arange(len(classifiers))
+    width = 0.2
+
+    plt.figure(figsize=(10,6))
+    for i, metric in enumerate(metrics_names):
+        plt.bar(x + i*width, values[metric], width=width, label=metric)
+
+    plt.xticks(x + width*1.5, classifiers)
+    plt.ylabel("Score")
+    plt.title("Metrics by Classifier")
+    plt.ylim(0, 1)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+plot_metrics(metrics)
