@@ -51,7 +51,7 @@ metrics = {}
 # 1. k-Nearest Neighbors (kNN)
 # ================================================
 print("\n-- k-Nearest Neighbors --")
-knn = KNeighborsClassifier(n_neighbors=5)
+knn = KNeighborsClassifier(n_neighbors=5, random_state=42)
 knn.fit(X_train_scaled, y_train)
 y_pred_knn = knn.predict(X_test_scaled)
 
@@ -66,7 +66,7 @@ metrics["kNN"] = {
 # 2. Logistic Regression
 # ================================================
 print("\n-- Logistic Regression --")
-lr = LogisticRegression(max_iter=1000)
+lr = LogisticRegression(max_iter=1000, random_state=42)
 lr.fit(X_train_scaled, y_train)
 y_pred_lr = lr.predict(X_test_scaled)
 
@@ -93,7 +93,13 @@ metrics["Feedforward NN"] = {
 }
 
 # ================================================
-# 4. Confusion Matrices
+# 4. Decision Tree
+# ================================================
+
+
+
+# ================================================
+# 5. Confusion Matrices
 # ================================================
 def plot_confusion(title, y_true, y_pred):
     cm = confusion_matrix(y_true, y_pred)
@@ -108,7 +114,7 @@ plot_confusion("Logistic Regression Confusion Matrix", y_test, y_pred_lr)
 plot_confusion("Feedforward NN Confusion Matrix", y_test, y_pred_mlp)
 
 # ================================================
-# 5. Visualization of Metrics
+# 6. Visualization of Metrics
 # ================================================
 
 def plot_metrics(metrics_dict):
